@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Rust in ten slides</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <style type="text/css" media="screen">
+      img {
+        max-width: 100%;
+        max-height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <textarea id="source">
+class: middle, center
+
+# Why You Should Learn Rust
+
+### Even a JavaScript developer can benefit from learning Rust
+
+---
+class: middle, center
+
+## Outline
+
+1. Rust Features
+1. Rust Ecosystem
+1. Rust In The Wild
+
+---
+class: middle, left
+
+## What is Rust
+
+A popular survival MMO video game.
+
+[![](https://files.facepunch.com/s/rust/5beb8a)](https://rust.facepunch.com/)
+
+![](https://screenshotscdn.firefoxusercontent.com/images/cc03894c-4531-4c2c-9cdc-7c8b4ed0d7f9.png)
+
+---
+class: middle, left
+
+## What is Rust
+
+- A system language.
+- Some called Rust "Pragmatic Haskell".
+- Produtivity, performance, safety. Take three.
+- Wins "most loved language" title in 3 consecutive years.
+  (Stackoverflow Developer Survey
+  [2016](https://insights.stackoverflow.com/survey/2016#technology-most-loved-dreaded-and-wanted),
+  [2017](https://insights.stackoverflow.com/survey/2017#technology-most-loved-dreaded-and-wanted-languages),
+  [2018](https://insights.stackoverflow.com/survey/2018#technology-most-loved-dreaded-and-wanted-languages))
+
+![](https://www.rust-lang.org/logos/rust-logo-256x256-blk.png)
+
+---
+class: middle, left
+
+## What is a system language
+
+- Does system programming
+  - Operating systems
+  - Device drivers
+  - Compilers
+  - Embedded systems
+- Minimal runtime should be considered
+- C, C++, ~~Go~~<sup>1<sup>
+
+> 1: [为什么微软不出一门像go或者rust的跨平台系统级语言?以它的实力完全可以做得到的?](https://www.zhihu.com/question/264294525/answer/391863351)
+
+
+---
+class: middle, left
+
+## Why not stick with C/C++
+
+![](https://memegenerator.net/img/instances/63621541/segfaults-segfaults-everywhere.jpg)
+
+---
+class: middle, left
+
+## Why not stick with C/C++
+
+[OpenSSL heartbleed](http://heartbleed.com/)
+
+![](http://heartbleed.com/heartbleed.png)
+
+
+---
+class: middle, center
+
+## Before started
+
+You can copy-paste code and play around with [Rust Playground](https://play.rust-lang.org/?code=%2F%2F+Goals%3A%0A%2F%2F+-+change+to+greet+you+by+name%0A%2F%2F+-+introduce+a+variable+%60name%60+and+insert+this+into+the+format+string%0A%2F%2F+-+try+%60println%21%28%22%7B%7D%22%2C+name%29%60+vs+%60println%21%28%22%7B%3A%3F%7D%22%2C+name%29%60+and+see+what+the+difference+is%0A%0Afn+main%28%29+%7B%0A++++println%21%28%22Hello%2C+world%21%22%29%3B%0A%7D%0A&version=nightly).
+
+![](https://screenshotscdn.firefoxusercontent.com/images/227da1e7-ca68-451b-8009-3177876f6af5.png)
+
+---
+class: middle, left
+
+## Rust Features
+
+- **Memory safety (without GC)**
+- **No data race**
+- Minimal runtime
+- High-level abstraction
+- **Great build system**
+- Powerful macro
+
+---
+class: middle, left
+
+## Define Memory Safety
+
+- No null pointer dereferences
+- No dangling pointers
+  - No double free
+  - No use-after-free
+- No out-of-bound-access
+  - No buffer overflow
+- No data race??
+
+Wiki: [Memory safety](https://en.wikipedia.org/wiki/Memory_safety)
+
+---
+class: middle, left
+
+## Unsafe in C++
+
+```c++
+#include <string>
+#include <iostream>
+
+using std;
+
+int main() {
+    std::vector<std::string> v;
+
+    v.push_back("Hello, ");
+
+    std::string &x = v[0];
+
+    v.push_back("world!"); // Problem occurs
+    
+    std::cout << x;
+}
+```
+
+... and cannot compile this snippet on my macbook
+
+---
+class: middle, left
+
+## Memory Safety in Rust
+
+```rust
+fn main() {
+    let mut s = Vec::new();
+    
+    s.push("Hello, ");
+    
+    let x = &s[0];
+    
+    s.push("world!");
+    
+    println!("{:?}", s);
+}
+```
+
+```
+error[E0502]: cannot borrow `s` as mutable because it is also borrowed 
+                 as immutable
+  --> src/main.rs:8:5
+6  |     let x = &s[0];
+   |              - immutable borrow occurs here
+7  |
+8  |     s.push("world!");
+   |     ^ mutable borrow occurs here
+...
+11 | }
+   | - immutable borrow ends here
+```
+
+---
+class: middle, left
+
+## Memory Safety in Rust
+
+Forced initialization + Ownership + Restricted aliasing
+
+### = Memory safety
+
+<span style="font-size: 0.8em">all at compile time!</span>
+
+---
+class: middle, left
+
+## Forced Initialization
+
+```rust
+fn main() {
+    let x: i32;
+}
+```
+
+Compiled without crashes.
+
+```rust
+fn main() {
+    let x: i32;
+    println!("{}", x);
+}
+```
+
+```
+error[E0381]: use of possibly uninitialized variable: `x`
+ --> src/main.rs:3:20
+  |
+3 |     println!("{}", x);
+  |                    ^ use of possibly uninitialized `x`
+```
+
+---
+class: middle, left
+
+## Forced Initialization
+
+```rust
+fn main() {
+    let x: i32;
+    if true {
+        x = 10;
+    } else {
+        x = 20;
+    }
+    println!("{}", x);
+}
+```
+
+Initialize `x` before using. Compiled without surprises.
+
+### What about null pointer?
+
+---
+class: middle, left
+
+## Rust has no null pointers
+
+Instead, Rust borrows the concepts
+[Option type](https://en.wikipedia.org/wiki/Option_type)
+from functional programming.
+
+An option type encapsulates null inside a container, 
+forcing programmers to **think about the nullability before implementing**.
+
+Without Option type, every single varible could be null and cause null pointer exceptions.
+
+[![](https://p.keepcalm-o-matic.co.uk/render/tshirt-mens-v2/w-480/c-b7312c/keep-calm-and-null-pointer-exception-1.png)](https://www.keepcalm-o-matic.co.uk/product/mens_t_shirts/keep-calm-and-null-pointer-exception-1/)
+
+---
+class: middle, left
+
+## `Option<T>`
+
+[`Option`](https://doc.rust-lang.org/std/option/) is just an enum in Rust. 
+
+```rust
+pub enum Option<T> {
+    None,
+    Some(T),
+}
+```
+
+Pattern matching with `Option` as an normal enum is like a breeze.
+
+```rust
+fn main() {
+    let maybe = Some(2);
+    match maybe {
+        Some(p) => println!("has value {}", p),
+        None => println!("has no value"),
+    }
+    // or `maybe.unwrap()`
+}
+```
+
+```
+> has value 2
+```
+
+---
+class: middle, left
+
+## Ownership
+
+Rust Ownership Rules
+
+1. Each value in Rust has a variable that’s called its owner.
+2. There can only be one owner at a time.
+3. When the owner goes out of scope, the value will be dropped ([RAII](https://en.wikipedia.org/wiki/RAII)).
+
+> Rust guarantees its memory safety by restricting variables from aliasing.
+
+Play around with [this playgournd](https://play.rust-lang.org/?code=fn+main%28%29+%7B%0A++++let+%28adjective%2C+name%29+%3D+two_words%28%29%3B%0A++++let+name+%3D+format%21%28%22%7B%7D+%7B%7D%22%2C+adjective%2C+name%29%3B%0A++++print_out%28name%29%3B%0A%7D%0A%0Afn+two_words%28%29+-%3E+%28String%2C+String%29+%7B%0A++++%28format%21%28%22fellow%22%29%2C+format%21%28%22Rustaceans%22%29%29%0A%7D%0A%0Afn+remove_vowels%28name%3A+String%29+-%3E+String+%7B%0A++++%2F%2F+Goal+%231%3A+What+is+needed+here+to+make+this+compile%3F%0A++++let+output+%3D+String%3A%3Anew%28%29%3B%0A++++for+c+in+name.chars%28%29+%7B%0A++++++++match+c+%7B%0A++++++++++++%27a%27+%7C+%27e%27+%7C+%27i%27+%7C+%27o%27+%7C+%27u%27+%3D%3E+%7B%0A++++++++++++++++%2F%2F+skip+vowels%0A++++++++++++%7D%0A++++++++++++_+%3D%3E+%7B%0A++++++++++++++++output.push%28c%29%3B%0A++++++++++++%7D%0A++++++++%7D%0A++++%7D%0A++++output%0A%7D%0A%0Afn+print_out%28name%3A+String%29+%7B%0A++++let+devowelized_name+%3D+remove_vowels%28name%29%3B%0A++++println%21%28%22Removing+vowels+yields+%7B%3A%3F%7D%22%2C+devowelized_name%29%3B%0A%0A++++%2F%2F+Goal+%232%3A+What+happens+when+you+uncomment+the+%60println%60+below%3F%0A++++%2F%2F+Can+you+change+the+code+above+so+that+the+code+below+compiles%0A++++%2F%2F+successfully%3F%0A++++%2F%2F%0A++++%2F%2F+println%21%28%22Removing+vowels+from+%7B%3A%3F%7D+yields+%7B%3A%3F%7D%22%2C%0A++++%2F%2F++++++++++name%2C+devowelized_name%29%3B%0A%0A++++%2F%2F+Extra+credit%3A+Can+you+do+it+without+copying+any+data%3F%0A++++%2F%2F+%28Using+only+ownership+transfer%29%0A%7D%0A&version=nightly)
+
+---
+class: middle, left
+
+## Move semantics
+
+```rust
+let s1 = String::from("hello");
+let s2 = s1; // s2 is the new owner.
+
+println!("{}, world!", s1); // Error. Value is moved.
+```
+
+<img src="https://doc.rust-lang.org/book/second-edition/img/trpl04-04.svg" width="40%">
+
+---
+class: middle, left
+
+## Scope and RAII
+
+```rust
+fn make_string() {
+    let s = "hello";   // s is valid from this point forward
+    println!("{}", s);
+}
+
+fn main() {
+    make_string();
+    // the scope of make_string is over.
+    // s is dropped immediately. No GC.
+}
+```
+
+---
+class: middle, center
+
+## How to share data between variables?
+
+Answer: resctrict aliasing with borrow checker.
+
+> This is the one of the most intimidating part of Rust.
+
+---
+class: middle, left
+
+## Borrow
+
+| ˈbɒrəʊ |
+
+_verb_
+
+Take and use (something belonging to someone else) with the intention of **returning** it
+
+---
+class: middle, left
+
+## Borrow Checker
+
+To guarantee data synchronization and prevent data racing,
+all references in Rust must follow at lease two rules:
+
+- Having 
+  - several immutable references (`&T`) or 
+  - exact one mutable reference (`&mut T`).
+- A reference must always be valid even it references to null.  
+  (use `Option<T>` representing null pointer)
+
+> Q: When will the borrowing returned from a reference?  
+> A: A reference would return its borrowing when it goes out of scope (RAII).
+
+
+
+---
+class: middle, left
+
+### Borrow Checker: several immutable refs
+
+```rust
+fn main() {
+    let s = String::from("hello");
+    let r1 = &s;
+    let r2 = &s;
+    let r3 = &s;
+    println!("{} {} {}", r1, r2, r3);
+}
+```
+
+```
+> hello hello hello
+```
+
+---
+class: middle, left
+
+### Borrow Checker: exact one mutable ref
+
+```rust
+fn main() {
+    let mut s = String::from("hello");
+
+    {
+        let r1 = &mut s;
+        println!("r1 {}", r1);
+    } // r1 returns the borrowing, so we can make a new reference.
+
+    let r2 = &mut s;
+    println!("r2 {}", r2);
+}
+```
+
+
+---
+class: middle, left
+
+### Borrow Checker: cannot mix mutable with immutable refs
+
+```rust
+fn main() {
+    let mut s = String::from("hello");
+
+    let r1 = &s; // no problem
+    let r2 = &s; // no problem
+    let r3 = &mut s; // BIG PROBLEM
+}
+```
+
+```
+error[E0502]: cannot borrow `s` as mutable because it is also borrowed as
+immutable
+ --> borrow_thrice.rs:6:19
+  |
+4 |     let r1 = &s; // no problem
+  |               - immutable borrow occurs here
+5 |     let r2 = &s; // no problem
+6 |     let r3 = &mut s; // BIG PROBLEM
+  |                   ^ mutable borrow occurs here
+7 | }
+  | - immutable borrow ends here
+```
+
+---
+class: middle, left
+
+## Hey, Ferris
+
+![](http://rustacean.net/assets/rustacean-orig-noshadow.svg)
+
+---
+class: middle, left
+
+
+## [Make your own Ferris](http://edunham.net/2016/04/11/plushie_rustacean_pattern.html)
+
+![](https://i.redd.it/pn2rtsvqg2d11.jpg)
+
+---
+class: middle, left
+
+## Rust Ecosystem
+
+[crates.io](https://crates.io/): a centralized package registry hosted by Rust core team.
+
+![](https://screenshotscdn.firefoxusercontent.com/images/94a2b26f-9186-4f06-aa05-fa9502ef215f.png)
+
+
+
+---
+class: middle, left
+
+## Rust Ecosystem
+
+[Docs.rs](https://docs.rs/): a unofficial documentation site for public crates.
+
+![](https://screenshotscdn.firefoxusercontent.com/images/a0bd0feb-15b9-4ef4-a29d-d65044d67acb.png)
+
+---
+class: middle, left
+
+## Rust Frontend frameowrk
+
+[Yew](https://github.com/DenisKolodin/yew)
+
+```rust
+impl Renderable<Model> for Model {
+    fn view(&self) -> Html<Self> {
+        html! {
+            // Render your model here
+            <button onclick=|_| Msg::DoIt,>{ "Click me!" }</button>
+        }
+    }
+}
+
+fn main() {
+    yew::initialize();
+    App::<Model>::new().mount_to_body();
+    yew::run_loop();
+}
+```
+
+---
+class: middle, left
+
+## Rust ORM
+
+[Diesel.rs](http://diesel.rs/)
+
+Made by author of [Active Record (Ruby)](https://guides.rubyonrails.org/active_record_basics.html)
+
+```rust
+let versions = Version::belonging_to(krate)
+  .select(id)
+  .order(num.desc())
+  .limit(5);
+let downloads = try!(version_downloads
+  .filter(date.gt(now - 90.days()))
+  .filter(version_id.eq(any(versions)))
+  .order(date)
+  .load::<Download>(&conn));
+```
+
+---
+class: middle, left
+
+## Rust Ecosystem
+
+- [Full-fledged Operating system](https://www.redox-os.org/)
+- [WebAssembly (Rust Wasm team)](https://github.com/rustwasm)
+- [Awesome Embedded Rust](https://github.com/rust-embedded/awesome-embedded-rust)
+
+---
+class: middle, left
+
+## Rust In The Wild
+
+Rust is everywhere in your daily life.
+
+- Microsoft
+  - [Azure IoT Edge](https://github.com/Azure/iotedge)
+  - [VS Code search (ripgrep)](https://www.reddit.com/r/rust/comments/63oykn/visual_studio_codes_new_ripgreppowered_search_has/)
+- Sentry: [Fixing Python Performance with Rust](https://blog.sentry.io/2016/10/19/fixing-python-performance-with-rust.html)
+- Dropbox
+  - [Optimizing cloud file-storage](https://www.wired.com/2016/03/epic-story-dropboxs-exodus-amazon-cloud-empire/)
+  - [Better compression with DivANS](https://blogs.dropbox.com/tech/2018/06/building-better-compression-together-with-divans/)
+- npm registry: replacing C and rewriting performance-critical bottlenecks in the registry service architecture
+- [Mercurial RIIR](https://www.mercurial-scm.org/wiki/OxidationPlan) and [Facebook is doing that](https://github.com/facebookexperimental/mononoke).
+- Atlassian: service for analyzing petabytes of source code.
+- Cloudflare: [replacement for memory-unsafe languages and core edge logic](https://blog.cloudflare.com/tag/rust/)
+- Mozilla: Firefox Quantum and Servo
+- Canonical (Unbuntu): from server monitoring to middleware.
+- Baidu X-Lab 百度安全实验室: [Rust SGX SDK](https://github.com/baidu/rust-sgx-sdk) and [memory-safe and OpenSSL-compatible TLS](https://github.com/mesalock-linux/mesalink)
+
+More on [Friends of Rust](https://www.rust-lang.org/en-US/friends.html).
+
+---
+class: middle, left
+
+
+## Community
+
+
+- [Reddit Rust](https://reddit.com/r/rust)
+- [Rust Forum](https://internals.rust-lang.org/)
+- http://rustacean.net/
+
+---
+class: middle, left
+
+## Random Good Stuff
+
+- University courses
+  - [Stanford CS140e](http://web.stanford.edu/class/cs140e/)
+  - [UVA CS4414](http://rust-class.org/)
+  - [UPenn CIS198](http://cis198-2016s.github.io/)
+- Online resources
+  - [Official Rust Book](https://doc.rust-lang.org/book/second-edition/)
+  - [Official Rust Book - 簡體中文翻譯版](https://kaisery.github.io/trpl-zh-cn/)
+  - [electronic_blue: 給 C++ 使用者的 Rust 簡介](https://electronic.blue/tags/Rust/)
+  - [Rust By Example](https://doc.rust-lang.org/rust-by-example/)
+  - [Nick Cameron: Rust for C++ programmers](https://github.com/nrc/r4cppp)
+- Video Talks
+ - [Sergio Benitez: A Case for Oxidation](https://www.youtube.com/watch?v=cDFSrVhnZKo)(Author of [Rocket framework](https://rocket.rs/))
+
+    </textarea>
+    <script src="https://remarkjs.com/downloads/remark-latest.min.js" type="text/javascript">
+    </script>
+    <script type="text/javascript">
+      var slideshow = remark.create();
+    </script>
+  </body>
+</html>
+
