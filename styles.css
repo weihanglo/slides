@@ -6,7 +6,7 @@ body {
 }
 
 .remark-code, .remark-inline-code {
-    font-family: 'Source Code Pro';
+    font-family: 'Fira Code', 'Fira Mono', 'Source Code Pro';
 }
 
 blockquote {
