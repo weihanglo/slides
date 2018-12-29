@@ -1,0 +1,3 @@
+*.html linguist-language=Rust
+*.css linguist-language=Rust
+

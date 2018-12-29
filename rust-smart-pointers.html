@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Rust Collections</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <style type="text/css" media="screen">
+      img {
+        max-width: 100%;
+        max-height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <textarea id="source">
+class: middle, center
+
+# Rust Smart Pointers
+
+### 最燒腦的智慧指標
+
+<img 
+  style="border-radius: 50px"
+  src="https://www.gravatar.com/avatar/67644641ead7ae60a795a14b7e102973?s=100" 
+  alt="Weihang Lo">
+
+<a href="https://github.com/weihanglo">@weihanglo</a>
+
+---
+
+## Define "Smart Pointers"
+
+- 特殊的指標類別，可動態配置記憶體（Dynamic allocation）。
+- 資料會配置在 heap，而指標本身配置在 stack。
+- 類似 C 的 `malloc` 等記憶體配置函數，但不需要對應的 `free`。
+- 又稱 fat pointer，因為儲存指向資料的指標外，通常會儲存額外資訊，例如陣列長度，空間需求稍大。
+
+> TODO: 可以參考 rust-collections slide 的描述
+
+---
+
+class: middle, center
+
+# Box
+
+---
+
+## Memory Layout
+
+---
+
+## When to use Box
+
+✅ ...
+
+✅ ...
+
+❌ ...
+
+---
+
+class: middle, center
+
+# AMA Time!
+
+We are from
+
+<img src="https://hahow.in/static/media/logo-black.23fa8b87.svg" width="250px" alt="Hahow 好學校" />
+
+Ask us anything!
+
+    </textarea>
+    <script src="https://remarkjs.com/downloads/remark-latest.min.js" type="text/javascript">
+    </script>
+    <script type="text/javascript">
+      var slideshow = remark.create();
+    </script>
+  </body>
+</html>
