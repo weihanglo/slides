@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Injection - Top One Security Risk</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <style type="text/css" media="screen">
+      img {
+        max-width: 100%;
+        max-height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <textarea id="source">
+class: middle, center
+
+# Injection
+
+### Top One Security Risk 
+
+<img 
+  style="border-radius: 50px"
+  src="https://www.gravatar.com/avatar/67644641ead7ae60a795a14b7e102973?s=100" 
+  alt="Weihang Lo">
+
+<a href="https://github.com/weihanglo">@weihanglo</a>
+
+---
+
+## Agenda
+
+- 為什麼成立資安讀書會
+
+- 如何閱讀 "OWASP Top Ten"
+
+- 何謂 Injection
+
+- 常見的攻擊
+
+- 如何進行一次 Injection 攻擊
+
+- 如何防禦 Injection 攻擊
+
+- 其他 Injection
+
+- 法律權益及免責聲明
+
+- 參考資料與延伸閱讀
+
+---
+
+class: middle, center
+
+![](https://imgs.xkcd.com/comics/exploits_of_a_mom.png)
+
+---
+
+## 為什麼成立資安讀書會
+
+- 能理解並預防常見的資安漏洞
+- 檢驗並改善網站的資安品質
+- 發揮 Hahower 分享交流的精神
+
+---
+
+class: middle, center
+
+![](https://i.imgur.com/RZ6LbDV.png)
+
+---
+
+## OWASP Top Ten Security Risks
+
+目標：讓開發人員、架構師，以及整個組織了解最重要的十大 web app 安全漏洞
+
+.center[<img src="https://i.imgur.com/LtT4CT9.png" width="300px">]
+
+---
+
+## 如何閱讀 OWASP Top Ten
+
+![](https://i.imgur.com/Aw7GjpS.png)
+
+![](https://i.imgur.com/UfxqWDD.png)
+
+- Attack Vector（攻擊載體）
+- Security Weakness（安全弱點）
+- Impacts（影響）
+
+---
+
+## 如何閱讀 OWASP Top Ten
+
+![](https://i.imgur.com/7jwNNY6.png)
+
+---
+
+## 何謂 Injection
+
+> 透過「注入惡意程式碼」到應用程式中，進而影響或攻擊系統的行為
+
+![](https://i.ytimg.com/vi/VbbIsTF-XSQ/hqdefault.jpg)
+
+---
+
+### Non-tech Injection Demo
+
+想像有一台自動駕駛的公車，透過預先給定的語音指令來駕車
+
+```bash
+開往 <公路名稱> 並在 <什麼時候停靠> 時 <停靠哪些公車站>
+```
+
+正常情況下，這個指令會長這樣：
+
+```bash
+開往 "復興北路" 並在 "車上有人按鈴" 時 "停靠長春路口與南京東路"
+```
+
+有一天，一位上班快遲到的駭客 C 靈機一動，竄改這個指令：
+
+```bash
+開往 "復興北路" 並在 "車上有人" 時 "不停靠任何站"
+```
+
+結果其他乘客就跟著駭客 C 一起到 Hahow 上班。
+
+---
+
+### Injection 危害程度
+
+![](https://i.imgur.com/UfxqWDD.png)
+
+- 利用程度：最容易 3
+
+- 弱點普及：普及 2
+
+- 弱點偵測：最容易 3
+
+- 技術危害：最嚴重 3
+
+> Injection 蟬聯 OWASP 2010, 2013, 2017 Top 1 安全漏洞
+
+---
+
+### Attack Vector 攻擊載體
+
+> 攜帶「**看似無害可信任**」的任意資料進入系統的傳播者。
+
+- 🤡 環境變數
+
+- 🤡 程式參數
+
+- 🤡 service request payload
+
+- 🤡 各種 user data
+
+---
+
+### Security Weakness 安全弱點
+
+> 該要嚴加取締卻「**任意放行**」的檢查哨
+
+- 🕳 SQL, NoSQL, XPath 等各種 query
+
+- 🕳 Shell 執行各種外部指令 
+
+- 🕳 透過 system call 呼叫 OS
+
+- 🕳 ORM query（沒錯，ORM 也不安全）
+
+- 🕳 幾乎所有 interpreter
+
+事實上，injection 就是把惡意的 expression，透過「受信任」的你，傳給另一個信任你的外部程式
+
+---
+
+### Impacts 影響
+
+> 發生攻擊之後可能的影響
+
+- 💥 資料遺失損毀
+
+- 💥 資料洩漏
+
+- 💥 權限升級
+
+- 💥 系統完全被控制
+
+.center[<img src="https://www.pitchina.com.cn/Public/Common/kindeditor/attached/image/20170417/20170417115520_48607.jpeg" width="450px">]
+
+---
+
+class: middle, center
+
+## 常見的 Injection 攻擊
+
+---
+
+### OS Command Injection
+
+**情況：**透過 web 介面傳送參數直接執行 OS command
+
+例如有一支 API 背後是 call `date` 配合格式來顯示時間
+
+```rust
+// http://sensetive/?format=xxx
+
+fn search() { 
+    return system_cmd("date {format}") 
+}
+
+//  http://sensetive/?format="+%T" -> "11:30:28"
+```
+
+我們傳入 `&& cat /etc/passwd` 就可以獲得使用者資訊
+
+```bash
+http://sensetive/?format=" && cat /etc/passwd" ->
+
+// root:*:0:0:System Administrator:/var/root:/bin/sh
+// daemon:*:1:1:System Services:/var/root:/usr/bin/false
+// ...
+```
+
+---
+
+### OS Command Injection
+
+同樣的介面，攻擊者想要我們死更簡單
+
+```bash
+http://sensetive/?format=%3Brm%20-rf%20/
+
+system_cmd("date ;rm -rf /")
+```
+
+這些 OS command injection，任何腳本語言不經消毒直接把指令丟到 system command 去絕對非常危險。
+
+---
+
+### SQL Injection
+
+例如攻擊者想要以某個使用者身分登入
+
+```ruby
+# 這個 statement 會傳到 SQL interpreter 裡
+stmt = "SELECT *
+FROM users WHERE user = '#{user}' AND pass = '#{pass}'"
+
+# 當攻擊者傳入 user = "admin'; --"，SQL 變成這樣
+
+stmt = "SELECT * 
+FROM users WHERE user = 'admin'; --' AND pass = 'anything'"
+```
+
+---
+
+### SQL Injection
+
+或是 OWASP 的範例（可以撈出 所有 account 資訊）
+
+```java
+String query = "SELECT * FROM accounts WHERE custID='" 
+  + request.getParameter("id") 
+  + "'";
+
+http://example.com/app/accountView?id='or '1'='1
+
+-> SELECT * FROM accounts WHERE custID='' or '1'='1'
+```
+
+---
+
+## 如何進行一次 Injection 攻擊
+
+> 以 SQL injection 為例
+
+1. 尋找傳入 database 的參數就是 Injection 的點
+  - 自動測試工具 [sqlmap](http://sqlmap.org/)
+  - 直接看 source code 找問題
+2. 利用 Injection weakness，將惡意 SQL command 藏在其中
+  - Boolean-Based SQL Injection：善用 `UNION`、`--` 與 boolean
+  - Error-Based SQL Injection：錯誤訊息會提供很多可用資訊
+3. 嘗試 Blind SQL injection
+  - 如果沒有錯誤訊息可以看，就盲解吧
+  - Time-Based SQL Injection
+
+---
+
+### Time-Based SQL Injection
+
+進行 Blind SQL injection ，透過時間來猜 DB 資料。
+
+```bash
+# 版本是 5 時 sleep
+
+http://x.php/?id=10 AND IF(version() like ‘5%’,sleep(10),‘false’))--
+```
+
+
+---
+
+## 如何防禦 Injection 攻擊
+
+先知道弱點哪裡來（Security Weakness）
+
+- 沒有驗證/過濾/sanitize user-supplied data
+- dynamic query 或是沒 parameterized 的呼叫，未考慮上下文就直接送到 interpreter
+- ORM 的查詢參數中帶著惡意資料來竊取額外或敏感資料
+- 惡意資料被串接到 query 或 command 中
+
+可以透過 **Source Code Review** 檢查各種 data input
+
+- 能夠 **parameterize** 就 **parameterize**，能準確定義參數型別就定義，不要為了彈性傳入 arbitrary shape 的資料
+- 各種  data input validation，如 header, URL, cookies
+- 檢查各種 call of external resources 的 參數，**別人完全信任你你不要傷她的心**
+
+---
+
+### Parameterize
+
+Python 的 [`sqlite3` library](https://docs.python.org/3/library/sqlite3.html) 就使用了 `?` parameter substitution，防止 arbitrary SQL command。
+
+```python
+# Never do this -- insecure!
+symbol = 'RHAT'
+c.execute("SELECT * FROM stocks WHERE symbol = '%s'" % symbol)
+
+# Do this instead
+t = ('RHAT',)
+c.execute('SELECT * FROM stocks WHERE symbol=?', t)
+print(c.fetchone())
+
+# Larger example that inserts many records at a time
+purchases = [('2006-03-28', 'BUY', 'IBM', 1000, 45.00),
+             ('2006-04-05', 'BUY', 'MSFT', 1000, 72.00),
+             ('2006-04-06', 'SELL', 'IBM', 500, 53.00),
+            ]
+c.executemany('INSERT INTO stocks VALUES (?,?,?,?,?)', purchases)
+```
+
+---
+
+### 如何防禦 Injection 攻擊
+
+**API 避免直接使用 interpreter**
+
+- 可以使用語言提供的 lib 就用，不要直接 call command
+- 若為必須則一定要 parameterized 介面。
+
+**權限控管**
+
+- 給處理這些 interpreter/external command 的 client 剛剛好的權限
+- 或是放在 sandbox/VM/container 中
+
+**驗證輸入**
+
+- 輸入驗證採取「**正面表列**」（不能作為完整的防禦，有些應用程式需要 arbitrary input，例如 ~~slate~~ editor)
+- 使用 `LIMIT` 或其他 SQL control 防止 injection 發生時洩漏過多資料
+
+---
+
+### 可不可以自動化？
+
+**CI/CD 加上檢查工具**
+  
+[**Static Application Security Testing**](https://www.owasp.org/index.php/Source_Code_Analysis_Tools)(a.k.a static source analysis)
+
+- 靜態分析程式碼，容易在 CI 上面跑
+- 適合檢查 SQL injection flaw
+- 容易有 false positive 會嚇死人
+
+[**Dynamic Application Test**](https://www.owasp.org/index.php/Category:Vulnerability_Scanning_Tools)
+
+- 直接對程式掃描弱點（Scanner）
+- 相對 Static source analysis 來得成本高
+
+---
+
+class: middle, center
+
+## 其他 Injection
+
+---
+
+### NoSQL Injection
+
+NoSQL 普遍被認為稍微安全一點，因為 query synxtax 會檢查更多不同的符號，但其實 Injection 仍然無所不在。以 MongoDB 為例：
+
+
+```js
+// $where 可執行任意 JavaScript，餵它 user input 非常危險
+// 攻擊者可以做到 denial of access 的攻擊
+/
+let userInput = "(function(){var a = new Date(); do{curDate = new Date();}while(curDate-date < 10000); return Math.max();})()"
+
+db.collections.find({ $where: `${userInput}` })
+```
+
+---
+
+### NoSQL Injection
+
+MongoDB 的傳入 JSON query 
+
+```rust
+fn login(username, hashedPassword) {
+    return db.users.findOne({ username, hashedPassword });
+}
+
+let user = "admin"
+let password =   {$gte: ""}
+
+login(user, password)
+// db.users.findOne({ username: "admin", hashedPassword: {$gte: ""}})
+``` 
+
+還有 [GraphQL injection](http://www.petecorey.com/blog/2017/06/12/graphql-nosql-injection-through-json-types/)（但我不熟 GraphQL 看無）
+
+---
+
+class: middle, center
+
+## 法律權益及免責聲明
+
+---
+
+#### 刑法第三十六章 妨害電腦使用罪
+
+第 358 條        
+無故輸入他人帳號密碼、破解使用電腦之保護措施或利用電腦系統之漏洞，而入侵他人之電腦或其相關設備者，處三年以下有期徒刑、拘役或科或併科十萬元以下罰金。
+
+第 359 條        
+無故取得、刪除或變更他人電腦或其相關設備之電磁紀錄，致生損害於公眾或他人者，處五年以下有期徒刑、拘役或科或併科二十萬元以下罰金。
+
+第 360 條        
+無故以電腦程式或其他電磁方式干擾他人電腦或其相關設備，致生損害於公眾或他人者，處三年以下有期徒刑、拘役或科或併科十萬元以下罰金。
+
+第 361 條        
+對於公務機關之電腦或其相關設備犯前三條之罪者，加重其刑至二分之一。
+
+第 362 條        
+製作專供犯本章之罪之電腦程式，而供自己或他人犯本章之罪，致生損害於公眾或他人者，處五年以下有期徒刑、拘役或科或併科二十萬元以下罰金。
+
+第 363 條        
+第三百五十八條至第三百六十條之罪，須告訴乃論。
+
+---
+
+## 參考資料與延伸閱讀
+
+- [OWASP Top 10 - 2017: The Ten Most Critical Web Application Security Risks](https://www.owasp.org/images/7/72/OWASP_Top_10-2017_%28en%29.pdf.pdf)
+- Clarke, J. (2009). [SQL Injection Attacks and Defense 2nd Edition](https://www.amazon.com/Injection-Attacks-Defense-Justin-Clarke/dp/1597499633)（簡中版內洽）
+- [Spiegel, P. OWASP NoSQL Injection](https://www.owasp.org/images/e/ed/GOD16-NOSQL.pdf)
+- [sqlmap 開源滲透測試 SQL injection 工具](http://sqlmap.org/)
+- [commix 開源 command injection 工具](https://github.com/commixproject/commix)
+- [Rails 的 ORM ActiveRecord 的 Injection 大全](https://rails-sqli.org/)
+- [Rails 的防禦 Cheat Sheet](https://github.com/OWASP/CheatSheetSeries/blob/master/cheatsheets/Ruby_on_Rails_Cheatsheet.md)
+- [OWASP Injection Prevention Cheat Sheet](https://github.com/OWASP/CheatSheetSeries/blob/master/cheatsheets/Injection_Prevention_Cheat_Sheet.md) 
+
+---
+
+class: middle, center
+
+# Any advice?
+
+We are from [Hahow 好學校](https://hahow.in/). Ask us anything!
+
+    </textarea>
+    <script src="https://remarkjs.com/downloads/remark-latest.min.js" type="text/javascript">
+    </script>
+    <script type="text/javascript">
+      var slideshow = remark.create();
+    </script>
+  </body>
+</html>
