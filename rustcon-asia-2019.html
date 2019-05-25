@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>RustCon Asia 2019 見聞錄</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <style type="text/css" media="screen">
+      img {
+        max-width: 100%;
+        max-height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <textarea id="source">
+class: middle, center
+
+# RustCon Asia 2019 見聞錄
+
+<img 
+  style="border-radius: 50px"
+  src="https://www.gravatar.com/avatar/67644641ead7ae60a795a14b7e102973?s=100" 
+  alt="Weihang Lo">
+
+<a href="https://github.com/weihanglo">@weihanglo</a>
+
+---
+
+## Agenda
+
+- Why Attended RustCon Asia
+
+- Messages from Rust Core Team
+
+- Talks. Talks. Talks.
+
+- Workshops
+
+---
+
+## Who am I?
+
+Weihang Lo ([@weihanglo](https://github.com/weihanglo))
+
+- 工友 @ [Hahow 好學校](https://hahow.in)
+- 2017 開始關注 Rust
+- 寫過 Rust DRM system（但離職後專案大概掛了...）
+- 維護 [Rust Algorithm Club](https://rust-algo.club)（長草中）
+
+---
+
+## Why Attended RustCon Asia
+
+
+- ⭐️ 想精進自己的 Rust 功力
+
+- ⭐️⭐️ 想認識來自遠方的 Rustacean
+
+- ⭐️⭐️ 想跟見上一面各路大神
+
+- ⭐️⭐️⭐️ 想了解 Rust 在亞洲的生態與應用場景 
+
+---
+
+![](https://i.imgur.com/hmrTfBw.jpg)
+
+---
+
+class: middle, center
+
+## Messages from Rust Core Team
+
+---
+
+## 2018: stability without stagnation
+
+- Features
+  - Non-lexical lifetimes
+  - procedural macros
+  - match ergonmics
+  - Module system
+- Tools
+  - Rustfmt
+  - Clippy
+  - IDE support
+  - cargo fix
+- Working groups
+  - WASM
+  - Embedded
+  - CLI
+  - Networking
+
+---
+
+## 2018 survey
+
+30% work in production
+
+25% more loc
+
+only 2% felt unwelcoming in Rust community
+
+93% think it's easy to fix breaking changes
+
+---
+
+## 2019: Maturity
+
+#### Governance
+
+- Immerse newcomer joined in the past years.
+- Some discussions of RFC gets 300+ comments
+
+#### Stablize Long-standing Requests
+
+- Custom allocators (done)
+- async/await (almost done?)
+- const generics
+- Generic associated types
+- Specialization
+- custom registries (done)
+
+#### Polish
+
+- compile-time
+- IDE support
+
+---
+
+class: middle, center
+
+## Talks. Talks. Talks.
+
+---
+
+## Categories
+
+- Blockchain/Security/Cryptography: 2
+- Security/Cryptography: 1
+- Competitive Programming: 1
+- Concurrenct Programming: 3
+- WebAssembly: 1
+- Linux/DevOps: 3
+- Learning: 3
+- Prod. Experiences: almost all in production!
+
+---
+
+## Who use Rust in production?
+
+#### Baidu X-Lab 百度安全實驗室
+
+- [MesaLock Linux](https://github.com/mesalock-linux)：userspace 的工具如 login, getty, init, coreutils
+- [MesaPy](https://github.com/mesalock-linux/mesapy): Memory safe Python interpreter，replaced unsafe lib with Rust
+
+#### Bilibili 嗶哩嗶哩
+
+- Remote cache service (for CI/CD)
+  - 需求：儲存 Bazel + Gradle 編譯中間產物、QPS: 5000、3TB update/day
+  - 用 CGO 很難寫 SIMD（需要寫 asm）。Rust 的 SIMD 完勝。
+- Thumbnail service
+  - 原本使用 CGO 寫的將 PNG/JEPG/WEBP -> transfrom/clip -> WEBP 格式
+  - Rsut export FFI 配合 actix-web 比 Go 版本快 3 倍。
+- Cache Proxy: 2x faster than Go version
+
+---
+
+## Who use Rust in production?
+
+#### Zhihu 知乎
+
+- Search service：取代 Rucene (Ruby binding Lucene)。用 Lucene 不敢將 CPU 操到 > 80%，怕 GC 雪崩。
+
+#### Alibaba 阿里巴巴
+
+- Distributed Actor System：在 actix 之外自幹符合需求的 actor system
+- Realtime Image Rendering Service
+  - 淘寶 app 廣告 banner，針對單一使用者客製化產生
+  - 2016 就上線撐過 2017 2018 兩次雙十一
+  - 原本 Node.js QPS: 60, RT: 200ms；**Rust QPS: 3000, RT: 10ms**
+  - 阿里內部還無法部署 Rust，所以偽裝成 Node.js App
+
+---
+
+## Who use Rust in production?
+
+
+#### [PingCAP](https://pingcap.com/)
+
+- [TiKV][tikv]: a distributed transactional key-value database, also a **CNCF incubating project**.
+
+[![](https://i.imgur.com/uLx7nQP.png)][tikv]
+
+[tikv]: https://tikv.org/
+
+---
+
+class: middle, center
+
+## Workshops
+
+---
+
+### How to Think in Rust
+
+
+**Q: Why don't `Box` (or other owning types) need a lifetime parameter?**
+
+**Q: Why is it an ownership graph but not a tree?**
+
+**Q: What is the roots of the ownership graph?**
+
+**Q: How does ownership relate to mutability?**
+
+---
+
+### How to Think in Rust
+
+**Q: Why don't `Box` (or other owning types) need a lifetime parameter?**
+
+Lifetime parameter is redundant for owning type.
+
+**Q: Why is it an ownership graph but not a tree?**
+
+To be a tree, it can only have exactly one owner. An owenship relationship is actually a directed acyclic graph (DAG). 
+
+**Q: What is the roots of the ownership graph?**
+
+- Each stack frame which owns it's local variables
+- Any data with the `'static` lifetime.
+
+**Q: How does ownership relate to mutability?**
+
+Mostly you need to own something in order to mutate it, except some types with interior mutabililties.
+
+---
+
+### How to Think in Rust
+
+![](https://i.imgur.com/7aM6xu3.png)
+
+---
+
+class: middle, center
+
+## Some Thoughts
+
+---
+
+.center[<img src="https://imgur.com/CaVLkdz.png" width="600px">]
+
+[Rust Meetup](https://www.meetup.com/topics/rust/)
+
+---
+
+### We need more Rustaceans in Asia!
+
+- No Japanese?
+
+- No Korean?
+
+- Not too many East South Asian (only met one Singaporean)
+
+- Workshops/Talks did not grade by difficulty.
+
+- Though there are interpreters, most talks in Chinese may prevent attendants outside Chinese culture sphere.
+
+- Maybe Some day RustCon Asia can be held in Taiwan!
+
+---
+
+
+## Facts about Rust Conferences
+
+| Conference                                          | Location            | Attendants | Talks         | Workshops | Rust   Teams Member |
+| --------------------------------------------------- | ------------------- | ---------- | ------------- | --------- | ------------------- |
+| [RustCon Asia 2019](https://rustcon.asia/)          | Beijing, China      | ~300       | 16 / 1.5 days | 12/2 days | 2 (1 in core team)  |
+| [Rust Latam 2019](https://rustlatam.org)            | Montevideo, Uruguay | ~150?      | 9             | 5         | 5 (2 in core team)  |
+| [Rust Conf 2018](https://rustconf.com/)             | Portland, USA       | ~350       | 16 / 2 tracks | 7         | a lots              |
+| [Rust Rush 2018](https://rustrush.ru/)              | Moscow, Russia      | ~100?      | 10            | 2         | 4 (2 in core team)  |
+| [RustFest Rome 2018](https://barcelona.rustfest.eu) | Rome, Italy         | ~150?      | 11            | 7         | 2 (1 in core team)  |
+
+---
+
+class: middle, center
+
+## New Definition of "OOP":
+
+## Ownership Oriented Programming
+
+---
+
+![](https://i.imgur.com/IjBxA8m.jpg)
+
+---
+
+## References
+
+[Slides are here](https://talk.citahub.com/t/topic/590), [here](https://shimo.im/docs/zliTJIGgNwk6QIFh/read) and [here](https://www.dropbox.com/sh/sk3guk4qei9sn78/AADfXHuzUPic35ELOQ5rGATra?dl=0)
+
+[Videos are here](https://www.youtube.com/playlist?list=PL85XCvVPmGQjPvweRqkBgnh_HKE5MBB8x)
+
+---
+
+class: middle, center
+
+# Any advice?
+
+We are from [Hahow 好學校](https://hahow.in/). Ask us anything!
+
+    </textarea>
+    <script src="https://remarkjs.com/downloads/remark-latest.min.js" type="text/javascript">
+    </script>
+    <script type="text/javascript">
+      var slideshow = remark.create();
+    </script>
+  </body>
+</html>
