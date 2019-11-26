@@ -47,3 +47,7 @@ table tbody td {
     color: #333;
     padding: 10px;
 }
+
+img {
+  max-width: 100%;
+}
