@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>K8s Workshop for Begineers</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+  </head>
+  <body>
+    <textarea id="source">
+class: middle, center
+
+# K8s Workshop for Begineers
+
+<img width="100%" src="https://d33wubrfki0l68.cloudfront.net/eb4e41f2cba0cbc8d119f8d0eb2bd6935cb78fc8/ba7d6/images/community/kubernetes-community-final-02.jpg">
+
+<img 
+  style="border-radius: 50px"
+  src="https://www.gravatar.com/avatar/67644641ead7ae60a795a14b7e102973?s=100" 
+  alt="Weihang Lo">
+
+<a href="https://github.com/weihanglo">@weihanglo</a>
+
+---
+
+# 目標
+
+- 從使用者的角度，了解 k8s 基本架構
+- 學會何謂 Pod 並裝入自己的 app 與其互動
+- 學會透過 Deployment scale 與 rolling update 自己的 app
+- 學會透過 Service 暴露自己的 app 到外部
+- 學會透過 kubectl 簡易除錯與查詢文件
+
+---
+
+# 要求
+
+先假設大家都用 macbook
+
+1. 下載 [Docker Desktop for Mac](https://docs.docker.com/docker-for-mac/install/)
+2. 到 Docker Desktop 設定頁面 [Enable kubernetes](https://docs.docker.com/docker-for-mac/#kubernetes)（需要執行一些時間安裝）
+3. 安裝完成後再 disable，但不要 reset
+4. 安裝 kubectl（K8s 官方的 commandline tool）： `brew install kubernetes-cli`
+
+---
+
+# 任務
+
+- 認識 k8s、玩玩 `kubectl`
+- 建立第一個 pod
+- 建立第一個 deployment
+- 更新 deployment（scale、update image）
+- 建立第一個 service
+- 綜合練習
+
+---
+
+# 開始 Workshop 之前
+
+- 講解內容壓縮，著重在動手做
+- 隨時打斷我問問題，不限於 K8s 本身
+- 主角是你們
+
+---
+
+class: middle, center
+
+# 認識 k8s、玩玩 `kubectl`
+
+---
+
+## K8s 能幹嘛的
+
+- Container Orchestration Platform
+- Self-Healing
+- Service Discovery / Load Balance
+- Rolling Update / Scaling
+
+![](https://d33wubrfki0l68.cloudfront.net/cc38b0f3c0fd94e66495e3a4198f2096cdecd3d5/ace10/docs/tutorials/kubernetes-basics/public/images/module_04_services.svg)
+
+---
+
+## K8s 對使用者來說有什麼用
+
+以 declarative way 定義資源的期望狀態，K8s 會盡力將系統達到期望狀態
+
+- 不再手動調整 app，隱含 immutable 概念
+- 將 stateful 和 stateless 資源分開管理，讓大部分 stateless 應用程式邏輯更簡單
+
+<img src="https://matthewpalmer.net/kubernetes-app-developer/articles/kubernetes-deployment-static.png" width="50%">
+
+---
+
+## K8s 的資源
+
+- 可操作的物件都是一種 RESTful resource，可對其 
+    - `GET`
+    - `CREATE`
+    - `PATCH`
+    - `DELETE`
+- 常見的資源有
+    - `namespace`
+    - `node`
+    - `pod`
+    - `deployment`
+    - `service`
+    - `event`
+
+---
+
+## 動手做
+
+```bash
+kubectl config get-contexts # 取得當前系統有哪些 context
+kubectl config use docker-desktop # 切換到不同的 context
+kubectl config current-context
+kubectl version # 檢查 client/server 版本
+
+kubectl cluster-info # 確認是 docker-desktop cluster 下
+# 查看當前有哪些 API resource 可以操作，觀看一下有什麼欄位
+kubectl api-resources
+
+kubectl get namespaces # 列出所有 namespace（加不加 s 都行）
+kubectl get nodes # 列出所有 node
+
+# 列出 kube-system 下所有 pod
+kubectl get pod -n kube-system 
+# 指定查看特定 pod，並以 yaml 格式輸出
+kubectl get pod -n kube-system kube-apiserver-docker-desktop -o yaml 
+# 列出 kube-system 下包含 label `tier` 
+# 為 control-plane 的 pod，並以 wide 格式輸出
+kubectl get pod -n kube-system -l tier=control-plane
+```
+
+---
+
+class: middle, center
+
+# 建立第一個 pod
+
+---
+
+## Pod 是什麼
+
+<img src="https://matthewpalmer.net/kubernetes-app-developer/articles/pod-animation-kubernetes.gif" width="600px">
+
+_From [https://matthewpalmer.net](https://matthewpalmer.net/kubernetes-app-developer/articles/what-is-a-pod-in-kubernetes.html)_
+
+---
+
+![](https://d33wubrfki0l68.cloudfront.net/5cb72d407cbe2755e581b6de757e0d81760d5b86/a9df9/docs/tutorials/kubernetes-basics/public/images/module_03_nodes.svg)
+
+---
+
+## Pod 是什麼
+
+- 最小封裝 app 的單位，裡面通常封裝一至多個 container
+- 也是最小被 scheduling 的單位，所有 container 都會被分配到同一個 node 上
+- 內部 container 共用 network、cgroup（權限）、volume
+- 有不同的生命週期（phase），`Creating`、`Running`、`Terminating` 等
+- 有一致性，Pod 內所有的 container 都達到特定 phase，Pod 的 phase 才會改變
+- pod 就有 auto-healing 的功能，預設掛掉就會 restart
+
+---
+
+## K8s Resource manifest
+
+Declarative way 建立資源
+
+```yaml
+# nginx-pod.yaml
+apiVersion: v1    # Resource 版本（不同版本的 spec 可能不同）
+kind: Pod         # K8s 資源類別
+metadata:         # 可供自身或其他資源利用辨識
+  name: my-nginx  # namespace 下唯一可識別的 Pod 名稱
+  labels:         # Label，會用在 selector
+    app: nginx
+spec:             # 定義這個資源想達到的狀態
+  containers:
+  - name: nginx         # container 可辨識名稱
+    image: nginx:1.17.2 # 要用哪個（docker）image
+    ports:
+    - containerPort: 80 # 將 container exposed port 曝露到 80 port
+```
+
+---
+
+## 動手做
+
+```bash
+kubectl create -f nginx-yaml.yaml # 建立 nginx app
+kubectl get pod -l app=nginx # 看看 nginx app 長得怎樣
+
+# 沒有看到 pod 狀態變化嗎？讓我們先刪掉剛剛的 pod
+kubectl delete pod my-nginx
+
+kubectl get pod -o wide -w # 用 wide 輸出格式，並 watch changes
+
+# 開另一個 terminal，然後建立 pod resource
+# apply 是更高級的 create/patch 融合體，會自動 diff merge changes
+kubectl apply -f nginx-yaml.yaml
+kubectl get pod -l app=nginx
+
+# 也可以透過 label selector 刪除所有包含 label 的 pod
+# 同時觀察 phase 的變化
+kubectl delete pod -l app=nginx
+```
+
+---
+
+class: middle, center
+
+# 建立第一個 deployment
+
+---
+
+## 何謂 Deployment
+
+- 管理 pod rollout/rollback（紀錄 rollout history）
+- 透過 label selector 選擇 pod
+- 可以進行 stateless app 的 scaling
+- 設定不同的 rolling update 策略（recreate、rolling）
+
+![](https://d33wubrfki0l68.cloudfront.net/152c845f25df8e69dd24dd7b0836a289747e258a/4a1d2/docs/tutorials/kubernetes-basics/public/images/module_02_first_app.svg)
+
+---
+
+![](https://matthewpalmer.net/kubernetes-app-developer/articles/deployment-diagram-kubernetes.gif)
+
+_From [https://matthewpalmer.net](https://matthewpalmer.net/kubernetes-app-developer/articles/what-is-a-pod-in-kubernetes.html)_
+
+---
+
+## Deployment manifest
+
+```yaml
+# nginx-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-nginx # name 和 pod 沒關係，因為是不同 resource
+spec:
+  selector: # ??? 試著用 kubectl explain 看看怎麼填寫
+  replicas: # ??? 試著用 kubectl explain 看看怎麼填寫
+  template: # 這裡就是 pod.spec 嗎？？？
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.17.2
+        ports:
+        - containerPort: 80
+```
+
+---
+
+## 動手做
+
+```bash
+kubectl explain deploy.spec # 看看 spec 上面有什麼 欄位
+
+# 建立 deployment 資源
+kubectl apply -f nginx-deployment.yaml
+
+# 觀察 deployment
+kubectl delete pod my-nginx-xxxxxx
+```
+
+---
+
+## 更新 deployment（scale、update image）
+
+- deployment 可以透過更改 `deployment.spec.replicas` 更動數量
+- 更動 `deployment.spec.template` 就會造成 rolling  update
+
+---
+
+## 動手做
+
+```bash
+# 將數量改到三個  replicas
+kubectl scale deploy my-nginx --replicas=3
+# 檢查 rollout 的狀況
+kubectl rollout status deploy my-nginx
+# 查看 rollout 的歷史紀錄
+kubectl rollout history deploy my-nginx
+# rollback 
+kubectl rollout undo deployment my-nginx --to-revision=1
+```
+
+---
+
+class: middle, center
+
+# 建立第一個 service
+
+---
+
+## 何謂 service
+
+<img src="https://d33wubrfki0l68.cloudfront.net/b964c59cdc1979dd4e1904c25f43745564ef6bee/f3351/docs/tutorials/kubernetes-basics/public/images/module_04_labels.svg" width="500px">
+
+---
+
+## 何謂 service
+
+- 用來暴露 pod 到 pod 外部的世界
+- 這個世界可能是 cluster 內部，或是 cluster 外
+- service 會產生 static 的 DNS record 和 port
+- 透過 label selector 選擇 pod
+
+---
+
+## 動手做
+
+---
+
+class: middle, center
+
+# 綜合練習
+
+---
+
+TODO
+
+---
+
+## 動手做
+
+---
+
+# 補充資料
+
+- [Kubernetes 官方網站（雖然零散但資源很多）](https://kubernetes.io)
+- [Kubernetes API Reference（也可愛用 `kubectl explain`）](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/)
+- []()
+    </textarea>
+    <script src="https://remarkjs.com/downloads/remark-latest.min.js" type="text/javascript">
+    </script>
+    <script type="text/javascript">
+      var slideshow = remark.create();
+    </script>
+  </body>
+</html>
