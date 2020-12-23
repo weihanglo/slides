@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Onboarding Training: Rust</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <style type="text/css" media="screen">
+      img {
+        max-width: 100%;
+        max-height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <textarea id="source">
+class: middle, center
+
+# Onboarding Training: Rust
+
+![](./rust-vs-others/rustconf-footer-illustration.svg)
+
+<img 
+  style="border-radius: 50px"
+  src="https://www.gravatar.com/avatar/67644641ead7ae60a795a14b7e102973?s=100" 
+  alt="Weihang Lo">
+
+<a href="https://github.com/weihanglo">@weihanglo</a>
+
+---
+
+## 你是否曾有以下疑問？
+
+- Rust 是什麼鬼語言
+
+- 感覺沒什麼人在用
+
+- 應該下個月就死了吧
+
+- 老子學不動了
+
+- 台上的，你可以一天不提 Rust 嗎 🖕🏽
+
+![](https://intro.rustbridge.com/img/ferris.gif)
+
+---
+
+![](rust-vs-others/aws.png)
+
+[Why AWS loves Rust, and how we’d like to help](https://aws.amazon.com/blogs/opensource/why-aws-loves-rust-and-how-wed-like-to-help/)
+
+---
+
+![](rust-vs-others/choromium.png)
+
+[Rust and C++ interoperability](https://www.chromium.org/Home/chromium-security/memory-safety/rust-and-c-interoperability)
+
+---
+
+![](rust-vs-others/cloudflare.png)
+
+[Enjoy a slice of QUIC, and Rust!](https://blog.cloudflare.com/enjoy-a-slice-of-quic-and-rust/)
+
+---
+
+![](rust-vs-others/curl.png)
+
+[Project Hyper-as-a-HTTP-backend-in-curl](https://github.com/curl/curl/wiki/Hyper)
+
+---
+
+![](rust-vs-others/discord.png)
+
+[Why Discord is switching from Go to Rust](https://blog.discord.com/why-discord-is-switching-from-go-to-rust-a190bbca2b1f)
+
+---
+
+![](rust-vs-others/figma.png)
+
+[Rust in Production at Figma](https://www.figma.com/blog/rust-in-production-at-figma/)
+
+---
+
+![](rust-vs-others/fuchsia.png)
+
+[Fuchsia Programming Language Policy: Rust](https://fuchsia.dev/fuchsia-src/contribute/governance/policy/programming_languages#rust)
+
+---
+
+![](rust-vs-others/microsoft.png)
+
+[Microsoft: Rust Is the Industry’s ‘Best Chance’ at Safe Systems Programming](https://thenewstack.io/microsoft-rust-is-the-industrys-best-chance-at-safe-systems-programming/)
+
+---
+
+![](rust-vs-others/sentry.png)
+
+[https://thenewstack.io/microsoft-rust-is-the-industrys-best-chance-at-safe-systems-programming/](https://blog.sentry.io/2016/10/19/fixing-python-performance-with-rust)
+
+---
+
+class: middle, center
+
+# 看完實際案例後，覺得 Rust 是怎樣的語言？
+
+<img src="https://rustacean.net/more-crabby-things/dancing-ferris.gif" width="50%">
+
+---
+
+**vs. C++ (memory safefy)**
+
+<iframe loading="lazy" width="100%" height="550" src="https://godbolt.org/e?hideEditorToolbars=true#z:OYLghAFBqd5TKALEBjA9gEwKYFFMCWALugE4A0BIEAZugHZEDKqAhgDbYgCMALOQCse5dq3qhUAUgBMAIRmzyAZ2ydURAg2rZ6mAMLp2AVwC29ENPI7MAGQL1sAOVMAjbKR78ADuiXFN9AbGZhbkPn4aDHYOziZuHnzKqtjqAUxErKREQabmlipqkfTpmUTRTq7unsoZWTkh%2BbVl9hVxVXwAlMroRqSoXADkMgDM9qjGOADUksN6SkSk9sAzuJIADACCI2MT2NOzmvOk2KwmK%2Btb0qP040ZTM3oAbikkpOebF/ZEkyas9hAdaYAdnkm0m4Mm80wIBAz3UZAeUJhRyWK0mjxmoI2EPRADovEYlEgAPouVioADWEBk0gAEqp2OhyNNpNIOpiLjjWEYSDIAGyTAAe%2BwAIujJABWWRrSUijlgiEAekVeIJRNJ5KpNIA7mR2JgwGAaezhrJJsrJgAFUjoFycEyTdCoVC9JSciFItA9b4PB5C/Z6P2e6zseXYiF0UiTCDckiTAiTEDowGSEHunHgz0YHkBv0ETHTBXg1Nyj5AkUDLrsEADCUDcjmAZrevoGuBuQKSE9Pp7EbcetEGvNjpdCkgCVrEQ13j1kzjyeN5vkVsDetKECTwdNyvkOCwFAYHD4YhkSjUOiMFgcLiJISWUTiECkQlEJKFALaXT1PISqy6cqxPE45hL4/gMN%2BFi/uEYH0ABlQeL%2BBQvGkTQQdIiHJKkDAlFkcFtAhNSlGhiFNHhQESl0Sjdv0NY0PQPx/PQALAliOKcN8Jg5o8oqTAAaikMIONqAJhjijz4oSSDUqy9LsIyzLGqJELsf6MxivyGJSjKEpyqa6bmiq4lqlJOp6gaRqsiarEQl4iyMOw9CGtJ0iprIIAzAAYiWNLMoKVn6bZXwOU5NKue5wxeeWPnJmGJY7tWtb1ouLY1gASi%2BXa9P0LLDNIA5DpWXRICcOAeACU4DDO5BzhODYFcuNZrhu5BbsOo7zhVwxJfVK75duXR7gg8AQCg2CCikPKnlQMakMASiWmIqhMEg6Dao2/bkBgJheAQohFAtDjsMtq3JZt6DbbtVTANwayWFtO2cKQADyPLHWt9VjSkGyzeuq5WONqDpIQjb1hezBsJw1RCNwIhiBICgKCIBAuOukBdOgXhFL9a7UTeNTAwdS0re9AwbdqpCsF4Nb9lWNZ1nV24NQMgoABx8gAtHyvCTMAzqTDduLSJMuAA5NUYQMerw5dwgLtvIch9W15DFawpXUO1tUJVVNULj1jXKM1rU7oNI0gJ9LqvGeM1zYTR3E%2Bt9b3btrD7YtdsnfVTuPU%2BfAs5OXvuC9zD2x9APfXN%2Bvm0D9j62DV6Q7eoQPqAz7zEjKPwOjmMBNj3RZVwjQE27b0O%2BQ5OU9T8V091jMrqnRCoPzuK8CzuJrMLotSxLhBSyMbKTOl8yK4VyslVU5Va7OHWnb1BubgVI7kGOms1l1DNLrPRuLwleXrylf1b10zykH4Wi8EAA%3D%3D%3D"></iframe>
+
+---
+
+**vs. JavaScript (move semantic/immutable)**
+
+<iframe loading="lazy" width="100%" height="300" src="//jsfiddle.net/4tn5dr96/embedded/js,result/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
+
+---
+
+**vs. JavaScript (move semantic/immutable)**
+
+<iframe loading="lazy" width="100%" height="500" src="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=c48a337336bf8cfa4c6768cbf7182dac" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
+
+---
+
+**vs. Python (fibonacci sequence)**
+
+![](https://i.imgur.com/1WPCHxn.png)
+
+---
+
+**vs. Python (fibonacci sequence)**
+
+<iframe loading="lazy" width="100%" height="550" src="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=00495529bd4304cba11ed9b6fef7e8cf" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
+
+---
+
+**vs. Kotlin (expression-oriented/pattern matching)**
+
+<iframe loading="lazy" width="100%" height="550" src="https://pl.kotl.in/HWzvk-tSj" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
+
+---
+
+**vs. Kotlin (expression-oriented/pattern matching)**
+
+<iframe loading="lazy" width="100%" height="550" src="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=12d301e87455ae90f4f3a2d03719626e" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
+
+---
+
+**vs. Ruby (quick sort)**
+
+<iframe loading="lazy" width="100%" height="550" src="https://bit.ly/3aE8etB" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
+
+---
+
+## 如何分類 Rust 這個語言
+
+> A language empowering everyone to build _reliable_ and _efficient_ software. 
+
+- 靜態強型別編譯語言（借助 LLVM 產生機器碼）
+- [無垃圾回收](https://steveklabnik.com/writing/borrow-checking-escape-analysis-and-the-generational-hypothesis)
+- [和 C 一樣快](https://benchmarksgame-team.pages.debian.net/benchmarksgame/which-programs-are-fastest.html)
+- 跨平台（包含瀏覽器與嵌入式）
+
+<img src="https://i.imgur.com/lfzuoPm.png" width="500px">
+
+---
+
+## Reliability: Memory Safety
+
+- 安全永遠是 Rust 的第一考量
+- 為了安全，可以犧牲一點效能，例如 array boundary check，或是為了讓自引資料結構的記憶體位置不變，而引入令人費解的 [`core::pin::Pin`](http://doc.rust-lang.org/1.48.0/stable/pin/struct.Pin.html)。
+
+![](rust-vs-others/rust-features.png)
+
+_Image source: https://arxiv.org/pdf/2003.03296.pdf_
+
+_Xu, H., Chen, Z., Sun, M., & Zhou, Y. (2020). Memory-Safety Challenge Considered Solved? An Empirical Study with All Rust CVEs. arXiv preprint arXiv:2003.03296._
+
+---
+
+### Reliability: Stability
+
+Rust 提供給開發者極為穩定的開發體驗，除了六週發佈一個[小版號](https://forge.rust-lang.org/#current-release-versions)
+
+- 嚴格遵守語義化版號，1.5 版的 code 用現在（1.48）版編譯器仍能正常編譯
+- 開出去的 API 不僅要向過去相容，[更向未來相容](https://github.com/rust-lang/cargo/blob/d484b65a/src/doc/src/reference/external-tools.md#information-about-package-structure)
+- 所有大型 Feature 都會經過[嚴格審核的 RFC 過程](https://rust-lang.github.io/rfcs/introduction.html)才會開始開發
+
+<img src="https://smallcultfollowing.com/babysteps/assets/2018-06-20-rfc-stages.svg" width="60%">
+
+---
+
+## Reliability: Community Trust
+
+- 所有 Roadmap、社群治理，團隊成員異動都公布在[官方部落格](https://blog.rust-lang.org/)和[官網](https://www.rust-lang.org/governance)
+- 為了 Rust 基金會成立，除了非同步收集意見，另外辦了[三場直播給不同時區的人即時與基金會籌備小組對談](https://blog.rust-lang.org/2020/12/07/the-foundation-conversation.html)
+- 到官方論壇、官方 Discord 和 Zulip，甚至非官方 Reddit，總是會有官方的人提供解答給你
+
+![](https://i.imgur.com/z8qYswD.png)
+
+---
+
+## Efficiency: Runtime Performance
+
+隨意找個例子，不解釋
+
+![](https://devblogs.microsoft.com/aspnet/wp-content/uploads/sites/16/2020/10/grpc-perf-graph.png)
+
+---
+
+## Efficiency: Developing Performance
+
+Rust 注重開發者體驗，雖然仍有部分面向需加強，但整體已十分完善
+
+- 不明確的編譯錯誤訊息視為 Bug，以增加使用者開發體驗
+- 自帶 Cargo 套件管理工具 + 編譯工具，可上傳到 [crates.io](https://crates.io)
+- Docstring（註釋即文件）可用 markdown 編寫，並可生成的 API doc（官方 API doc 集中營 [docs.rs](https://docs.rs)）
+
+![](https://i.imgur.com/E3tbFbK.png)
+
+---
+
+## Efficiency: Resource Economy
+
+
+- 零成本抽象，節能減碳救地球
+- 奉行 C++ 的哲學**「you only pay for what you use」**
+
+<img src="https://i.imgur.com/g701giw.png" width="50%">
+
+---
+
+## Rust 特性一覽
+
+![](https://i.imgur.com/RPm2Bxk.png)
+
+_Source：[2020 年度 Rust 官方問卷調查結果](https://blog.rust-lang.org/2020/12/16/rust-survey-2020.html)_
+
+---
+
+class: middle
+
+## Variables
+
+```rust
+let name = "Ashley";
+let age = 30;
+println!("Hi, {}! You are {} years old.", name, age);
+```
+
+---
+
+<iframe loading="lazy" width="100%" height="550" src="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=82b7ae3f9b48c7d17a154846118cd9e0" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
+
+---
+
+`x` 宣告兩次，編譯會過嗎？
+
+<iframe loading="lazy" width="100%" height="550" src="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=4cf9568b384bdf83d871d7e073cf26df" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
+
+---
+
+[原生型別](https://doc.rust-lang.org/stable/std/#primitives)
+
+<iframe loading="lazy" width="100%" height="550" src="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=e85ff4b6431931c26d3022b7677b16a3" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
+
+---
+
+函式這樣宣告
+
+<iframe loading="lazy" width="100%" height="550" src="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&code=fn%20add(x%3A%20i32%2C%20y%3A%20i32)%20-%3E%20i32%20%7B%0A%20%20%20%20x%20%2B%20y%20%2F%2F%20%E6%B2%92%E6%9C%89%20return%20%E6%98%AF%E5%90%88%E6%B3%95%E7%9A%84%E5%97%8E%EF%BC%9F%EF%BC%9F%EF%BC%9F%0A%7D%0A%0Afn%20main()%20%7B%0A%20%20%20%20println!(%22%7B%7D%22%2C%20add(42%2C%2013))%3B%0A%7D" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
+
+---
+
+為什麼陣列編譯不過？
+
+<iframe loading="lazy" width="100%" height="550" src="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&code=%2F%2F%20Why%20this%20cannot%20compile%3F%0A%0Afn%20main()%20%7B%0A%20%20%20%20let%20mut%20color%20%3D%20%5B255%2C%200%2C%20255%5D%3B%0A%20%20%20%20color%5B0%5D%20%3D%20100%3B%0A%20%20%20%20color%20%3D%20%5B255%2C%200%2C%20244%5D%3B%0A%20%20%20%20color%20%3D%20%5B222%2C%2022%5D%3B%0A%20%20%20%20println!(%22The%20color%20is%20%7B%3A%3F%7D%22%2C%20color)%3B%0A%7D" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
+
+---
+
+通常使用 [Vec](https://doc.rust-lang.org/stable/std/vec/struct.Vec.html) 動態陣列
+
+<iframe loading="lazy" width="100%" height="550" src="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&code=%2F%2F%20%E5%8B%95%E6%85%8B%E9%99%A3%E5%88%97%E6%89%8D%E8%83%BD%E5%8B%95%E6%85%8B%E5%A2%9E%E5%8A%A0%E5%85%83%E7%B4%A0%0A%2F%2F%20%E4%BF%AE%E5%BE%A9%E6%88%91%EF%BC%81%0Afn%20main()%20%7B%0A%20%20%20%20let%20prices%20%3D%20vec!%5B30%2C%20100%2C%202%5D%3B%0A%20%20%20%20prices%5B0%5D%20%3D%2025%3B%0A%20%20%20%20prices.push(40)%3B%0A%20%20%20%20println!(%22All%20the%20prices%20are%3A%20%7B%3A%3F%7D%22%2C%20prices)%3B%0A%7D" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
+
+---
+
+迴圈這樣寫
+
+<iframe loading="lazy" width="100%" height="550" src="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&code=fn%20main()%20%7B%0A%20%20%20%20for%20i%20in%200..10%20%7B%0A%20%20%20%20%20%20%20%20println!(%22Number%20%7B%7D%22%2C%20i)%3B%0A%20%20%20%20%7D%0A%0A%20%20%20%20let%20ch%20%3D%20vec!%5B%22%E5%81%89%22%2C%20%22%E8%88%AA%22%2C%20%22%E5%B8%A5%22%5D%3B%0A%20%20%20%20for%20ch%20in%20ch.iter()%20%7B%0A%20%20%20%20%20%20%20%20println!(%22%7B%7D%2F%22%2C%20ch)%3B%0A%20%20%20%20%7D%0A%20%20%20%20%2F%2F%20while%20%5Bboolean%5D%20%7B%7D%0A%20%20%20%20%2F%2F%20loop%20%7B%7D%0A%7D" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
+
+---
+
+## [所有權 Ownership](https://rust-lang.tw/book-tw/ch04-01-what-is-ownership.html)
+
+- Rust 中每個數值都會有一個變數作為它的擁有者（owner）。
+- 同時間只能有一個擁有者。
+- 當擁有者離開作用域時，數值就會被丟棄。（[RAII](https://en.wikipedia.org/wiki/RAII)）
+
+```rust
+let s1 = String::from("hello");
+let s2 = s1; // s2 is the new owner.
+println!("{}, world!", s1); // Error. Value is moved.
+```
+
+<img src="https://doc.rust-lang.org/stable/book/img/trpl04-04.svg" width="40%">
+
+---
+
+函式參數也會進行所有權轉換
+
+<iframe loading="lazy" width="100%" height="550" src="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&code=%2F%2F%20%E8%AE%93%E4%BB%96%E6%88%90%E5%8A%9F%E7%B7%A8%E8%AD%AF%EF%BC%81%0A%0Apub%20fn%20main()%20%7B%0A%20%20%20%20let%20v%20%3D%20Vec%3A%3Anew()%3B%0A%0A%20%20%20%20fill_vec(v)%3B%0A%20%20%20%20println!(%22%7B%7D%20has%20length%20%7B%7D%20content%20%7B%3A%3F%7D%22%2C%20%22vec1%22%2C%20v.len()%2C%20v)%3B%0A%0A%20%20%20%20v.push(88)%3B%0A%20%20%20%20println!(%22%7B%7D%20has%20length%20%7B%7D%20content%20%7B%3A%3F%7D%22%2C%20%22vec1%22%2C%20v.len()%2C%20v)%3B%0A%0A%7D%0A%0Afn%20fill_vec(vec%3A%20Vec%3Ci32%3E)%20%7B%0A%20%20%20%20let%20vec%20%3D%20vec%3B%0A%20%20%20%20vec.push(22)%3B%0A%7D" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
+
+---
+
+class: middle, center
+
+# 如果 Rust 不能共用變數，那寫屁 code？？？
+
+![](https://i.imgur.com/9lFEsjq.png)
+
+---
+
+[可變引用與不可變引用](https://rust-lang.tw/book-tw/ch04-02-references-and-borrowing.html)
+
+<iframe loading="lazy" width="100%" height="550" src="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&code=fn%20main()%20%7B%0A%20%20%20%20let%20v%20%3D%20vec!%5B1%2C%202%2C%203%5D%3B%0A%20%20%20%20print_vec(%26v)%3B%0A%20%20%20%20print_vec(%26v)%3B%0A%7D%0Afn%20print_vec(v%3A%20%26Vec%3Ci32%3E)%20%7B%20%2F%2F%20%26T%20%E4%BB%A3%E8%A1%A8%E5%80%9F%E7%94%A8%0A%20%20%20%20println!(%22v%20is%20%7B%3A%3F%7D%22%2C%20v)%3B%0A%7D%0A" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
+
+---
+
+## [可變引用與不可變引用](https://rust-lang.tw/book-tw/ch04-02-references-and-borrowing.html)
+
+在同一個 scope 下，Rust 惡名昭彰的 borrow checker 會檢查所有的引用：
+
+- 同時有多個 `&T` 不可變引用，但無法與 `&mut T` 同時存在
+- 只能有一個 `&mut T` 可變引用，且無法與 `&T` 同時存在
+
+同樣地，引用與數值的所有權行為相同，出了作用域就會被丟棄（[drop](http://doc.rust-lang.org/stable/core/ops/trait.Drop.html)）
+
+```rust
+fn main() {
+    let mut v = vec![1, 2, 3];
+    change_vec(&mut v);
+    change_vec(&mut v);
+    println!("v is {:?}", v);
+}
+fn change_vec(v: &mut Vec<i32>) {
+    v[0] *= 5;
+    // `v` 這個 &mut 引用在此被 drop，但不影響原始的 `vec![1,2,3]`
+}
+```
+
+---
+
+前面的題目，改寫成借用形式
+
+<iframe loading="lazy" width="100%" height="550" src="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&code=%2F%2F%20%E8%AB%8B%E6%94%B9%E5%AF%AB%E6%88%90%E3%80%8C%E5%80%9F%E7%94%A8%E3%80%8D%E5%BD%A2%E5%BC%8F%EF%BC%81%0A%0Apub%20fn%20main()%20%7B%0A%20%20%20%20let%20v%20%3D%20Vec%3A%3Anew()%3B%0A%0A%20%20%20%20fill_vec(v)%3B%0A%20%20%20%20println!(%22%7B%7D%20has%20length%20%7B%7D%20content%20%7B%3A%3F%7D%22%2C%20%22vec1%22%2C%20v.len()%2C%20v)%3B%0A%0A%20%20%20%20v.push(88)%3B%0A%20%20%20%20println!(%22%7B%7D%20has%20length%20%7B%7D%20content%20%7B%3A%3F%7D%22%2C%20%22vec1%22%2C%20v.len()%2C%20v)%3B%0A%0A%7D%0A%0Afn%20fill_vec(vec%3A%20Vec%3Ci32%3E)%20%7B%0A%20%20%20%20let%20vec%20%3D%20vec%3B%0A%20%20%20%20vec.push(22)%3B%0A%7D" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
+
+---
+
+可變引用再一題，嘗試改變 `Foo` struct 的資料結構
+
+<iframe loading="lazy" width="100%" height="550" src="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&code=struct%20Foo%20%7B%0A%20%20%20%20x%3A%20i32%2C%0A%7D%0A%0Afn%20add_foo_x(f%3A%20%26mut%20Foo)%20%7B%0A%20%20%20%20%2F%2F%20%E5%8F%AF%E8%AE%8A%E5%BC%95%E7%94%A8%E5%82%B3%E5%85%A5%E5%BE%8C%EF%BC%8C%E6%9C%83%E5%9C%A8%E9%80%99%E8%A3%A1%20drop%20%E6%8E%89%0A%7D%0A%0Afn%20main()%20%7B%0A%20%20%20%20let%20mut%20foo%20%3D%20Foo%20%7B%20x%3A%2042%20%7D%3B%0A%20%20%20%20add_foo_x(foo)%3B%0A%20%20%20%20%2F%2F%20%E5%95%8F%E9%A1%8C%EF%BC%9A%E5%98%97%E8%A9%A6%E5%8D%B0%E5%87%BA%20Foo%20%7B%20x%3A%2044%20%7D%0A%20%20%20%20println!(%22%7B%3A%3F%7D%22%2C%20foo)%3B%0A%7D" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
+
+---
+
+### 沒有次回的次回預告：[Lifetime annotation](https://rust-lang.tw/book-tw/ch10-03-lifetime-syntax.html)
+
+<img src="https://rufflewind.com/img/rust-move-copy-borrow.png" width="45%">
+
+_Source: [Graphical depiction of ownership and borrowing in Rust](https://rufflewind.com/2017-02-15/rust-move-copy-borrow)_
+
+---
+
+如何標註[生命週期](https://rust-lang.tw/book-tw/ch10-03-lifetime-syntax.html)（一般情況下你不會也不想做這件事）
+
+<iframe loading="lazy" width="100%" height="550" src="https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&code=fn%20longest%3C'a%3E(x%3A%20%26'a%20str%2C%20y%3A%20%26'a%20str)%20-%3E%20%26'a%20str%20%7B%0A%20%20%20%20if%20x.len()%20%3E%20y.len()%20%7B%0A%20%20%20%20%20%20%20%20x%0A%20%20%20%20%7D%20else%20%7B%0A%20%20%20%20%20%20%20%20y%0A%20%20%20%20%7D%0A%7D%0A%0Afn%20main()%20%7B%0A%20%20%20%20let%20s1%20%3D%20String%3A%3Afrom(%22abcd%22)%3B%0A%20%20%20%20let%20s2%20%3D%20String%3A%3Afrom(%22efghi%22)%3B%0A%20%20%20%20let%20longer%20%3D%20longest(s2.as_str()%2C%20s2.as_str())%3B%0A%20%20%20%20%0A%20%20%20%20println!(%22%E6%9C%80%E9%95%B7%E7%9A%84%E6%98%AF%20%7B%3A%3F%7D%22%2C%20longer)%3B%0A%7D%0A" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
+
+---
+
+## FAQ
+
+- Q：Rust 主要想解決誰的痛點
+
+最初是 Firefox 在平行處理 CSS 用 C++ 寫一直有各種 memory bug，不過最近 Mozilla 裁掉一堆 Rust/Servo 的人 😂
+
+- Q：當初為什麼想學 Rust
+
+原本是像學個有辦法摸記憶體配置的語言，看來看去選擇不多，加上對 Mozilla 社群開源理念的支持。
+
+- Q：Rust 最為人詬病的地方
+
+編譯速度沒有之一，跟 C++ 有得比。
+
+- Q：為什麼 Rust 標準函式庫缺東缺西的，連 random 都沒有
+
+Rust 團隊為了函式庫的穩定與相容性，非常嚴格把關進入標準函式庫的函式，像 regex 和 random 這種大家需求差異大，而且迭代更新快速的套件，就傾向由社群管理。以免發生像 urllib urllib2 等混亂或人力不足。
+
+---
+
+## FAQ
+
+- Q：Rust ( 或 Rust 相關 io framework ) 的 io 處理機制與 Node.js/Go 的比較
+
+我猜應該是想問 async IO 或是 web framework 這種 IO。
+
+Rust 標準函式庫提供非同步計算的抽象 [trait Future](https://doc.rust-lang.org/stable/std/future/trait.Future.html) 和其他相關的功能，並且 Rust 支援 `async` 語法，可以讓 function 或 block 變成非同步，回傳任何 `impl Future`（可以想像是回傳 JavaScript 的 Promise）。由於沒有直接提供 runtime，所以 Rust 生態自幹輪子寫了很多套類似 libuv libev 等 async Runtime，最有名支援度最好的是 [Tokio](https://tokio.rs/)。Tokio 就幾乎類似 libuv，呼叫 epoll/kqueue/IOCP 然後有個 event loop 和各種 work-stealth mode 的 Schuduler（目前是這個模式）。
+
+由於 Rust 原生支援 `async fn`，所以寫起來更接近 JavaScript，和 Go 自己實作 callstack 的 coroutine 反而不太一樣。不過受益於 Rust 強大的 Macro system，也有做出[類似 Goroutine 的套件](https://github.com/Xudong-Huang/may)。
+
+- Q：現在入坑來得及嗎
+
+絕對來得及，許多開源專案還有不少低垂的果實，台灣 Rust 生態也不完善，就缺你當社群大佬。
+
+---
+
+## 學習資源
+
+- [Rust 官網](https://www.rust-lang.org/zh-TW/)
+- [Rust 程式設計語言（正體中文版）](https://rust-lang.tw/book-tw)（這是官方教學）
+- [Rust 標準函式庫](https://doc.rust-lang.org/std/)（推薦閱讀！可以學到超多）
+- [Rust 超詳細非官方作弊表](https://cheats.rs/)
+- [Rust 版 Caniuse.rs](https://caniuse.rs/)
+- [Rust Taiwan Telegram 群組](https://t.me/rust_tw)
+- [致敬 A Tour of Go 的 Tour of Rust](https://tourofrust.com/00_en.html)（品質還行，但繁中翻譯有缺需加強）
+- 直接在 Twitter/GitHub/Telegram 聯絡我 @weihanglo
+
+
+    </textarea>
+    <script src="https://remarkjs.com/downloads/remark-latest.min.js" type="text/javascript">
+    </script>
+    <script type="text/javascript">
+      var slideshow = remark.create();
+    </script>
+  </body>
+</html>
