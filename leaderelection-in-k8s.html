@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Leader Election in K8s</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+  </head>
+  <body>
+    <textarea id="source">
+class: middle, center
+
+# Leader Election in K8s
+
+<img width="100%" src="https://d33wubrfki0l68.cloudfront.net/eb4e41f2cba0cbc8d119f8d0eb2bd6935cb78fc8/ba7d6/images/community/kubernetes-community-final-02.jpg">
+
+<img 
+  style="border-radius: 50px"
+  src="https://www.gravatar.com/avatar/67644641ead7ae60a795a14b7e102973?s=100" 
+  alt="Weihang Lo">
+
+<a href="https://github.com/weihanglo">@weihanglo</a>
+
+---
+
+### Goals
+
+- Understand common properties of learder election algorithm
+
+- Understand leader election algorithm in K8s
+
+- Demo time?
+
+---
+
+![](https://www.modernservantleader.com/wp-content/uploads/2013/05/boss-vs-leader-800x800.png)
+
+---
+
+### Leader election algorithm
+
+Pros
+
+- Redundancy
+
+- Reducing coordination
+
+- Improving efficiency
+
+Cons
+
+- Introduces failure mode
+
+- Scaling bottleneck
+
+---
+
+### Properties 1, 2, 3, 4
+
+
+One leader
+
+- Should only get one leader in a election
+
+Two states
+
+- Elected
+- Non-elected
+
+Three conditions
+
+- Termination
+- Uniqueness
+- Agreement
+
+Four aspects
+
+- Communication mechanism
+- Process names
+- Network topology
+- Size of the network
+
+---
+
+### How `client-go` elects leaders?
+
+- Atomicity depends on K8s API atomicity (resource as some sort of Lock primitive)
+  - ResourceVersions - Every API object has a unique ResourceVersion, and you can use these versions to perform compare-and-swap on Kubernetes objects
+  - Annotations - Every API object can be annotated with arbitrary key/value pairs to be used by clients.
+
+- Lease-based
+    - Single database store who's current leader
+    - Heartbeat telling everyone I am alive
+    - Depends on time elapse duration (not wall-clock time)
+
+---
+
+### `client-go` properties
+
+- Does not guarantee that only one client is acting as a leader (a.k.a. no fencing).
+
+- A client only acts on timestamps captured locally to infer the state of the leader election (instead of a global timestamp).
+
+- Depnds on changes not accuracy
+  - Tolerant to arbitrary clock skew
+  - Not tolerant to arbitrary clock skew rate.
+
+---
+
+### `client-go` architecture
+
+Two parts
+
+- Resource Lock (API Object)
+  - Create/Get/Update lock
+
+- Eelector
+  - Run the election
+  - Acquire/Release lock -> depends on resource lock
+  - Update lock -> depends on resource lock
+
+---
+
+### What happens when a leader fails?
+
+- Two separate steps
+  - "make work durable"
+  - "tell others it is complete"
+
+- One important property: idempotency (or via optimistic locking)
+
+---
+
+### Use Cases
+
+- kube-scheduler
+
+- kube-controller-manager
+
+- snapshot-controller
+
+- cluster-autoscaler
+
+---
+
+### References
+
+- https://en.wikipedia.org/wiki/Leader_election
+
+- https://pkg.go.dev/k8s.io/client-go/tools/leaderelection
+
+- https://aws.amazon.com/builders-library/leader-election-in-distributed-systems/
+
+    </textarea>
+    <script src="https://remarkjs.com/downloads/remark-latest.min.js" type="text/javascript">
+    </script>
+    <script type="text/javascript">
+      var slideshow = remark.create();
+    </script>
+  </body>
+</html>
